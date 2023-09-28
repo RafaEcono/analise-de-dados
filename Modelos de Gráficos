@@ -1,0 +1,40 @@
+# Aspectos para salvamento: PDF (9,18 x 4,75), use cairo_pdf device
+# Formatação no Latex: [width=1\textwidth, trim = 20mm 0mm 0mm 0mm]
+
+
+teste <- tratamento %>% 
+  
+  group_by(sexo,situação,anos_educ) %>% 
+  srvyr::summarise(total = srvyr::survey_prop(na.rm = T, vartype = NULL )) 
+  
+# Grafico exemplo para DADOS EMPILHADOS (ótimo para analisar composição de algo em subgrupos) 
+Gráfico 3: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://repositorio.ipea.gov.br/bitstream/11058/7290/1/PPE_v46_n02_Determinantes.pdf
+
+teste %>% 
+  ggplot(aes(fill = anos_educ,
+             x = situação, 
+             y = total)) +
+  
+  geom_bar(position = "fill",
+           stat = "identity", width = 0.5) +
+
+  scale_y_continuous(expand = expansion(add = c(0,0.02)),
+                     labels = scales::percent_format()) +
+  
+  scale_x_discrete(labels = c("Estuda\ne trabalha","Não estuda\nnem trabalha","Estuda","Trabalha"))+
+  
+  facet_wrap(~sexo) +
+  
+  geom_text(data = subset(teste,!(anos_educ %in% c("Menos de 1","1 a 4"))),
+            mapping = aes(label = round(total*100, digits = 2)),
+            position = position_stack(vjust = 0.5),
+            size = 3,
+            family = "serif") + 
+  
+  labs(x = NULL, y = NULL, fill = "Anos de Educação") +
+  
+  theme_minimal(base_size = 12,base_family = "serif") +
+  
+  theme(axis.line = element_line()) +
+  
+  scale_fill_manual(values = hcl.colors(n = 5,palette = "geyser"))
